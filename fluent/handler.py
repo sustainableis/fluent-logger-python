@@ -25,7 +25,11 @@ class FluentRecordFormatter(object):
       return eData
 
     def format(self, record):
-        data = {
+        try:
+          exec_info = record.exc_info
+        except AttributeError,e:
+          exec_info = None
+	data = {
           'sys_host' : self.hostname,
           'sys_name' : record.name,
           'sys_module' : record.module,
