@@ -14,8 +14,9 @@ except ImportError:
 from fluent import sender
 
 class FluentRecordFormatter(object):
-    def __init__(self):
+    def __init__(self, appname):
         self.hostname = socket.gethostname()
+        self.appname = appname
 
     def formatException(self, exceptionInfo):
       eData = {}
@@ -30,6 +31,7 @@ class FluentRecordFormatter(object):
         except AttributeError,e:
           exec_info = None
 	data = {
+          'app_name' : self.appname,
           'sys_host' : self.hostname,
           'sys_name' : record.name,
           'sys_module' : record.module,
@@ -67,6 +69,7 @@ class FluentHandler(logging.Handler):
     '''
     def __init__(self,
            tag,
+           appname,
            host='localhost',
            port=24224,
            timeout=3.0,
@@ -76,7 +79,7 @@ class FluentHandler(logging.Handler):
         self.sender = sender.FluentSender(tag,
                                           host=host, port=port,
                                           timeout=timeout, verbose=verbose)
-        self.fmt = FluentRecordFormatter()
+        self.fmt = FluentRecordFormatter(appname)
         logging.Handler.__init__(self)
 
     def emit(self, record):
